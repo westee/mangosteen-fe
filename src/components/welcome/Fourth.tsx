@@ -1,13 +1,11 @@
-import { FunctionalComponent } from "vue";
 import s from "./WelcomeLayout.module.scss";
-import clock from "../../assets/icons/clock.svg";
+import cloud from "../../assets/icons/cloud.svg";
 import { RouterLink } from "vue-router";
 import { WelcomeLayout } from "./WelcomeLayout";
-
-export const Second = () => (
+export const Fourth = () => {
     <WelcomeLayout>
         {{
-            icon: () => <img class={s.icon} src={clock} />,
+            icon: () => <img class={s.icon} src={cloud} />,
             title: () => (
                 <h2>
                     每日提醒
@@ -20,11 +18,14 @@ export const Second = () => (
                     <RouterLink class={s.fake} to="/start">
                         跳过
                     </RouterLink>
-                    <RouterLink to="/welcome/3">下一页</RouterLink>
-                    <RouterLink to="/start">跳过</RouterLink>
+                    <RouterLink to="/start">完成</RouterLink>
+                    <RouterLink class={s.fake} to="/start">
+                        跳过
+                    </RouterLink>
                 </>
             ),
         }}
-    </WelcomeLayout>
-);
-Second.displayName = "SecondWelcome";
+    </WelcomeLayout>;
+};
+
+Fourth.displayName = "FourthWelcome";

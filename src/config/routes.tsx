@@ -2,7 +2,7 @@ import { RouteRecordRaw } from "vue-router";
 import { First } from "../components/welcome/First";
 import { Third } from "../components/welcome/Third";
 import { Second } from "../components/welcome/Second";
-import { Forth } from "../components/welcome/Forth";
+import { Fourth } from "../components/welcome/Fourth";
 import { Welcome } from "../views/Welcome";
 
 export const routes: RouteRecordRaw[] = [
@@ -15,7 +15,7 @@ export const routes: RouteRecordRaw[] = [
       { path: "1", component: First },
       { path: "2", component: Second },
       { path: "3", component: Third },
-      { path: "4", component: Forth }
+      { path: "4", component: Fourth }
     ],
   },
 ];

@@ -1,13 +1,15 @@
-import { createApp } from 'vue'
-import App from './App'
-import {createRouter, createWebHashHistory} from 'vue-router'
-import {routes} from './config/routes'
+import { createApp } from "vue";
+import App from "./App";
+import { createRouter, createWebHashHistory } from "vue-router";
+import { routes } from "./config/routes";
+import "@svgstore";
+import { history } from "./shared/history";
 
-  const router = createRouter({
-    history: createWebHashHistory(),
-    routes: routes, 
-  })
+const router = createRouter({
+  history,
+  routes,
+});
 
-const app = createApp(App)
-app.use(router)
-app.mount('#app')
+const app = createApp(App);
+app.use(router);
+app.mount("#app");

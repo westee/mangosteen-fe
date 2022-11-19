@@ -17,4 +17,11 @@ export default defineConfig({
       resolves: [VantResolve()],
     }),
   ],
+  server: {
+    proxy: {
+      '/api/v1': {
+        target: 'xxx'
+      }
+    }
+  }
 });

@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/v1': {
-        target: 'xxx'
+        target: 'http://101.43.101.169:3001'
       }
     }
   }

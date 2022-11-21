@@ -13,18 +13,31 @@ const router = createRouter({
 
 fetchMe();
 
+const whiteList: Record<string, 'exact' | 'startsWith'> = {
+  '/': 'exact',
+  '/start': 'exact',
+  '/welcome': 'startsWith',
+  '/sign_in': 'startsWith',
+}
+
 router.beforeEach(async (to, from) => {
-  if (to.path === '/' || to.path.startsWith('/welcome') || to.path.startsWith('/sign_in')
-    || to.path === '/start') {
-    return true
-  } else {
-    const path = await mePromise!.then(
-      () => true,
-      () => '/sign_in?return_to=' + to.path
-    )
-    return path
+  for (const key in whiteList) {
+    const value = whiteList[key];
+    if  ((value === "exact" && to.path === key) ||
+    (value === "startsWith" && to.path.startsWith(key))){
+      return true
+    }
   }
-})
+  console.log('mm bofore');
+  
+  const mm = mePromise!.then(
+    () => true,
+    () => "/sign_in?return_to=" + to.path
+  )
+  console.log(mm);
+  
+  return mm;
+});
 
 const app = createApp(App);
 app.use(router);

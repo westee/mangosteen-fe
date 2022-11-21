@@ -1,11 +1,12 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from "axios";
 import { defineComponent, PropType, reactive, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { MainLayout } from "../layouts/MainLayout";
 import { Button } from "../shared/Button";
 import { Form, FormItem } from "../shared/Form";
 import { http } from "../shared/Http";
 import { Icon } from "../shared/Icon";
-import { validate } from "../shared/validate";
+import { hasError, validate } from "../shared/validate";
 import s from "./SignInPage.module.scss";
 export const SignInPage = defineComponent({
   setup: (props, context) => {
@@ -18,7 +19,10 @@ export const SignInPage = defineComponent({
       code: [],
     });
     const refValidationCode = ref<any>();
-    const onSubmit = (e: Event) => {
+    const router = useRouter()
+    const route = useRoute()
+
+    const onSubmit = async (e: Event) => {
       e.preventDefault();
       Object.assign(errors, {
         email: [],
@@ -37,7 +41,21 @@ export const SignInPage = defineComponent({
           { key: "code", type: "required", message: "必填" },
         ])
       );
+
+      if (!hasError(errors)) {
+        const res = await http
+          .post<{jwt: string}>("/session", {
+            email: formData.email,
+            code: formData.code,
+          })
+          .catch(onError);
+          localStorage.setItem('jwt', res.data.jwt);
+          // router.push('/sign_in?return_to='+ encodeURIComponent(route.fullPath))
+          const returnTo = route.query.return_to?.toString();
+          router.push(returnTo || '/')
+      }
     };
+
     const onError = (error: any) => {
       if (error.response.status === 422) {
         Object.assign(errors, error.response.data.errors);
@@ -51,8 +69,8 @@ export const SignInPage = defineComponent({
           email: formData.email,
         })
         .catch(onError);
-        console.log(res);
-        
+      console.log(res);
+
       refValidationCode.value.startCount();
     };
     return () => (
@@ -84,7 +102,7 @@ export const SignInPage = defineComponent({
                   ref={refValidationCode}
                 />
                 <FormItem style={{ paddingTop: "96px" }}>
-                  <Button>登录</Button>
+                  <Button type="submit">登录</Button>
                 </FormItem>
               </Form>
             </div>

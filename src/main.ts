@@ -28,13 +28,10 @@ router.beforeEach(async (to, from) => {
       return true
     }
   }
-  console.log('mm bofore');
-  
   const mm = mePromise!.then(
     () => true,
     () => "/sign_in?return_to=" + to.path
   )
-  console.log(mm);
   
   return mm;
 });

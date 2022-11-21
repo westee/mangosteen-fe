@@ -20,8 +20,8 @@ export const SignInPage = defineComponent({
       code: [],
     });
     const refValidationCode = ref<any>();
-    const router = useRouter()
-    const route = useRoute()
+    const router = useRouter();
+    const route = useRoute();
 
     const onSubmit = async (e: Event) => {
       e.preventDefault();
@@ -45,16 +45,18 @@ export const SignInPage = defineComponent({
 
       if (!hasError(errors)) {
         const res = await http
-          .post<{jwt: string}>("/session", {
-            email: formData.email,
-            code: formData.code,
-          })
+          .post<{ jwt: string }>(
+            "/session",
+            formData
+          )
           .catch(onError);
-          localStorage.setItem('jwt', res.data.jwt);
-          // router.push('/sign_in?return_to='+ encodeURIComponent(route.fullPath))
-          const returnTo = route.query.return_to?.toString();
-          refreshMe()
-          router.push(returnTo || '/')
+          console.log(res);
+          
+        localStorage.setItem("jwt", res.data.jwt);
+        // router.push('/sign_in?return_to='+ encodeURIComponent(route.fullPath))
+        const returnTo = route.query.return_to?.toString();
+        refreshMe();
+        router.push(returnTo || "/");
       }
     };
 

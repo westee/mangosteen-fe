@@ -15,8 +15,8 @@ export const mockSession: Mock = (config) => {
 };
 
 export const mockTagIndex: Mock = (config) => {
-  console.log("config");
-  console.log(config);
+  // console.log("config");
+  // console.log(config);
 
   let id = 0;
   const createId = () => {
@@ -36,8 +36,8 @@ export const mockTagIndex: Mock = (config) => {
   if (config.params.kind === "expenses") {
     console.log(createTag(7));
 
-    return [200, { resources: createTag(7) }];
+    return [200, { resources: createTag(7), pager: {page: 1} }];
   } else {
-    return [200, { resources: createTag(20) }];
+    return [200, { resources: createTag(20) , pager: {page: 1}}];
   }
 };

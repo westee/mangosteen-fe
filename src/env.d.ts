@@ -42,6 +42,11 @@ type Resources<T = any> = {
   }
 }
 
+type User = {
+  id: number;
+  email: string;
+}
+
 type Resource<T> = {
   resource: T
 }

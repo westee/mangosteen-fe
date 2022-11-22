@@ -1,63 +1,92 @@
-import { defineComponent, PropType, reactive, toRaw } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { Button } from '../../shared/Button';
-import { EmojiSelect } from '../../shared/EmojiSelect';
-import { Form, FormItem } from '../../shared/Form';
-import { http } from '../../shared/Http';
-import { onFormError } from '../../shared/onFormError';
-import { hasError, Rules, validate } from '../../shared/validate';
-import s from './Tag.module.scss';
+import { defineComponent, onMounted, PropType, reactive, toRaw } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { Button } from "../../shared/Button";
+import { EmojiSelect } from "../../shared/EmojiSelect";
+import { Form, FormItem } from "../../shared/Form";
+import { http } from "../../shared/Http";
+import { onFormError } from "../../shared/onFormError";
+import { hasError, Rules, validate } from "../../shared/validate";
+import s from "./Tag.module.scss";
 export const TagForm = defineComponent({
   props: {
     name: {
-      type: String as PropType<string>
-    }
+      type: String as PropType<string>,
+    },
+    id: Number,
   },
   setup: (props, context) => {
-    const formData = reactive({
-      name: '',
-      sign: '',
-    })
-    const router = useRouter();
     const route = useRoute();
-    const errors = reactive<{ [k in keyof typeof formData]?: string[] }>({})
+
+    const formData = reactive({
+      id: undefined,
+      name: "",
+      sign: "",
+      kind: route.query.kind!.toString(),
+    });
+    const router = useRouter();
+    const errors = reactive<{ [k in keyof typeof formData]?: string[] }>({});
     const onSubmit = async (e: Event) => {
       const rules: Rules<typeof formData> = [
-        { key: 'name', type: 'required', message: '必填' },
-        { key: 'name', type: 'pattern', regex: /^.{1,4}$/, message: '只能填 1 到 4 个字符' },
-        { key: 'sign', type: 'required', message: '必填' },
-      ]
+        { key: "name", type: "required", message: "必填" },
+        {
+          key: "name",
+          type: "pattern",
+          regex: /^.{1,4}$/,
+          message: "只能填 1 到 4 个字符",
+        },
+        { key: "sign", type: "required", message: "必填" },
+      ];
       Object.assign(errors, {
         name: [],
-        sign: []
-      })
-      Object.assign(errors, validate(formData, rules))
-      e.preventDefault()
-      if(!hasError(errors)){
-        const response = await http.post('/tags', formData, {
-          params: {_mock: 'tagCreate'},
-        }).catch((error)=>
-          onFormError(error, (data)=> Object.assign(errors, data.errors))
-        )
-        router.back()
+        sign: [],
+      });
+      Object.assign(errors, validate(formData, rules));
+      e.preventDefault();
+      if (!hasError(errors)) {
+        const promise = await formData.id
+          ? http.patch(`/tags/${formData.id}`, formData, {
+              params: { _mock: "tagEdit" },
+            })
+          : http.post("/tags", formData, {
+              params: { _mock: "tagCreate" },
+            });
+
+        promise.catch((error) =>
+          onFormError(error, (data) => Object.assign(errors, data.errors))
+        );
+        router.back();
       }
-    }
+    };
+    onMounted(async ()=> {
+      if(!props.id){ return }
+      const response = await http.get<Resource<Tag>>(`/tags/${props.id}`, 
+      // {_mock: 'tagShow'}
+        )
+      Object.assign(formData,response.data.resource)
+    })
     return () => (
       <Form onSubmit={onSubmit}>
-        <FormItem label='标签名（最多 4 个字符）'
+        <FormItem
+          label="标签名（最多 4 个字符）"
           type="text"
           v-model={formData.name}
-          error={errors['name']?.[0]} />
-        <FormItem label={'符号 ' + formData.sign}
-          type="emojiSelect" v-model={formData.sign}
-          error={errors['sign']?.[0]} />
+          error={errors["name"]?.[0]}
+        />
+        <FormItem
+          label={"符号 " + formData.sign}
+          type="emojiSelect"
+          v-model={formData.sign}
+          error={errors["sign"]?.[0]}
+        />
         <FormItem>
           <p class={s.tips}>记账时长按标签即可进行编辑</p>
         </FormItem>
         <FormItem>
-          <Button type="submit" class={[s.button]}>确定</Button>
+          <Button type="submit" class={[s.button]}>
+            确定
+          </Button>
         </FormItem>
       </Form>
-    )
-  }
-})
+    );
+  },
+});

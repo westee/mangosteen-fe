@@ -4,14 +4,14 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import { routes } from "./config/routes";
 import "@svgstore";
 import { history } from "./shared/history";
-import { fetchMe, mePromise } from "./shared/me";
+import { useMeStore } from "./stores/useMeStore";
+import { createPinia } from "pinia";
 
 const router = createRouter({
   history,
   routes,
 });
 
-fetchMe();
 
 const whiteList: Record<string, 'exact' | 'startsWith'> = {
   '/': 'exact',
@@ -28,7 +28,7 @@ router.beforeEach(async (to, from) => {
       return true
     }
   }
-  const mm = mePromise!.then(
+  const mm = meStore.mePromise!.then(
     () => true,
     () => "/sign_in?return_to=" + to.path
   )
@@ -36,6 +36,11 @@ router.beforeEach(async (to, from) => {
   return mm;
 });
 
+const pinia = createPinia();
 const app = createApp(App);
+app.use(pinia);
 app.use(router);
 app.mount("#app");
+
+const meStore = useMeStore()
+meStore.fetchMe();

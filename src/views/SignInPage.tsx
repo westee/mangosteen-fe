@@ -7,11 +7,13 @@ import { Button } from "../shared/Button";
 import { Form, FormItem } from "../shared/Form";
 import { http } from "../shared/Http";
 import { Icon } from "../shared/Icon";
-import { refreshMe } from "../shared/me";
 import { hasError, validate } from "../shared/validate";
+import { useMeStore } from "../stores/useMeStore";
 import s from "./SignInPage.module.scss";
 export const SignInPage = defineComponent({
   setup: (props, context) => {
+    const meStore = useMeStore();
+
     const formData = reactive({
       email: "",
       code: "",
@@ -46,17 +48,14 @@ export const SignInPage = defineComponent({
 
       if (!hasError(errors)) {
         const res = await http
-          .post<{ jwt: string }>(
-            "/session",
-            formData
-          )
+          .post<{ jwt: string }>("/session", formData)
           .catch(onError);
-          console.log(res);
-          
+        console.log(res);
+
         localStorage.setItem("jwt", res.data.jwt);
         // router.push('/sign_in?return_to='+ encodeURIComponent(route.fullPath))
         const returnTo = route.query.return_to?.toString();
-        refreshMe();
+        meStore.refreshMe();
         router.push(returnTo || "/");
       }
     };
